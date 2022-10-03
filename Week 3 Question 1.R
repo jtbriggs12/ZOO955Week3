@@ -70,3 +70,9 @@ preds <- mutate(preds, fit_resp  = ilink(fit_link), right_upr = ilink(fit_link +
 
 preds$right_upr[preds$Length_at_capture == 300]
 preds$right_lwr[preds$Length_at_capture == 300]
+
+#Q1.6: Are there any problems with applying logistic regression to the data from this study?
+### This data is not normally distributed and therefore violates the assumptions of linear modeling
+plot(model)
+
+
