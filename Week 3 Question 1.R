@@ -39,6 +39,7 @@ mf <- mf %>% mutate(success = Sex_at_capture - Sex_at_recapture)
 model <- glm(success ~ Length_at_capture, data = mf, family = binomial)
 summary(model)
 plot(model)
+
 #No, length does not impact transition likelihood - p-value = 0.1122
 
 #Q1.3b By how much is the log odds of sex change predicted to change for every millimeter increase in length?
@@ -51,8 +52,21 @@ mf$predict <- predict.glm(model, type='response')
 ggplot() +
   geom_point(data = mf, aes(x = Length_at_capture, y = success)) +
   geom_line(data = mf, aes(x = Length_at_capture, y = predict), color = 'blue') +
-  ylab('Success where 1 = Sex Change') + xlab('Length at Initial Capture (mm)')
+ labs(y = 'Success where 1 refers to a Sex Change', x = 'Length at Initial Capture (mm)')
 
 #Figure Caption: Model estimates shows that as tail length increases, probability of transition decreases.
 
-              
+# Q1.5: Provide a 95% prediction interval for the probability of sex change for a female of length 300 mm.
+fish<-data.frame(Length_at_capture = seq(250, 311, 1))
+fam <- family(model)
+ilink <- fam$linkinv
+ilink <- family(model)$linkinv
+
+preds <- bind_cols(fish, setNames(as_tibble(predict(model, fish, se.fit = TRUE)[1:2]), c('fit_link',"se_link")))
+
+preds <- mutate(preds, fit_resp  = ilink(fit_link), right_upr = ilink(fit_link + (2 * se_link)), right_lwr = ilink(fit_link - (2 * se_link)))
+
+
+
+preds$right_upr[preds$Length_at_capture == 300]
+preds$right_lwr[preds$Length_at_capture == 300]
